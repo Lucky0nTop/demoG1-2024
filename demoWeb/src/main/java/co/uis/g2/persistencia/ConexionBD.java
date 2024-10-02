@@ -1,4 +1,4 @@
-package co.uis.g2;
+package co.uis.g2.persistencia;
 
 
 import java.sql.*;
