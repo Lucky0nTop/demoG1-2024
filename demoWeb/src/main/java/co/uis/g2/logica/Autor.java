@@ -5,14 +5,36 @@
  */
 package co.uis.g2.logica;
 
+import co.uis.g2.persistencia.ConexionBD;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author CENTIC
  */
-public class Autor {
+public class Autor implements CRUDAutor {
+
     private String codigo;
     private String nombre;
-    private String nacionalida;
+    private String nacionalidad;
+
+    public Autor() {
+    }
+
+    public Autor(String codigo) {
+        this.codigo = codigo;
+    }
+
+    public Autor(String codigo, String nombre, String nacionalida) {
+        this.codigo = codigo;
+        this.nombre = nombre;
+        this.nacionalidad = nacionalida;
+    }
 
     public String getCodigo() {
         return codigo;
@@ -30,15 +52,60 @@ public class Autor {
         this.nombre = nombre;
     }
 
-    public String getNacionalida() {
-        return nacionalida;
+    public String getNacionalidad() {
+        return nacionalidad;
     }
 
-    public void setNacionalida(String nacionalida) {
-        this.nacionalida = nacionalida;
+    public void setNacionalidad(String nacionalidad) {
+        this.nacionalidad = nacionalidad;
+    }
+
+    @Override
+    public String toString() {
+        return "Autor{" + "codigo=" + codigo + ", nombre=" + nombre + ", nacionalidad=" + nacionalidad + '}';
     }
     
     
-    
-    
+
+    @Override
+    public boolean guardarAutor() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean eliminarAutor() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean actualizarAutor() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<Autor> listarAutores() {
+        ConexionBD conexion = new ConexionBD();
+        String query = "SELECT * FROM autores;";
+        List<Autor> autores = new ArrayList<>();
+        ResultSet rs = conexion.consultarBD(query);
+        try {        
+            Autor a;
+            while (rs.next()) {
+                a= new Autor();
+                a.setCodigo(rs.getString("codigo"));
+                a.setNombre(rs.getString("nombre"));
+                a.setNacionalidad(rs.getString("nacionalidad"));
+                autores.add(a);
+            }
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Autor.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {           
+            //conexion.closeConnection();
+             return autores;
+        }
+
+        
+    }
+
 }

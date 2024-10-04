@@ -7,28 +7,49 @@ import java.util.logging.Logger;
 
 public class ConexionBD {
 
-    private String DB_driver = "com.mysql.cj.jdbc.Driver";
-    private String url = "jdbc:mysql://localhost:3306/biblioteca?serverTimezone=UTC";
-    private String username = "root";
-    private String password = "MYSQLCentic";
-    private Connection con = null;
+    // Configuracion de la conexion a la base de datos 
+    private String DB_driver = "";
+    private String url = "";
+    private String db = "";
+    private String host = "";
+    private String username = "";
+    private String password = "";
+    public Connection con = null;
+    private Statement stmt = null;
+    private ResultSet rs = null;
 
+    //Constructor sin parmetros		
     public ConexionBD() {
+        DB_driver = "com.mysql.cj.jdbc.Driver";
+        host = "localhost:3306";
+        db = "biblioteca";
+        url = "jdbc:mysql://" + host + "/" + db + "?serverTimezone=UTC"; 		//URL DB
+        username = "root";                      			//usuario base de datos global 
+        password = "MYSQLCentic";
         try {
+            //Asignacin del Driver
             Class.forName(DB_driver);
-            con = DriverManager.getConnection(url, username, password);
-            con.setTransactionIsolation(Connection.TRANSACTION_READ_COMMITTED);
-            System.out.println("Conectado");
-        } catch (ClassNotFoundException | SQLException ex) {
+        } catch (ClassNotFoundException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
         }
+        try {
+            // Realizar la conexion
+            con = DriverManager.getConnection(url, username, password);
+            con.setTransactionIsolation(8);
+            System.out.println("conectado ☻☻☺☻");
+        } catch (SQLException ex) {
+            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        // Realizar la conexin
     }
 
+    //Retornar la conexin
     public Connection getConnection() {
         return con;
     }
 
-    public void closeConnection() {
+    //Cerrar la conexin
+    public void closeConnection(Connection con) {
         if (con != null) {
             try {
                 con.close();
@@ -38,61 +59,76 @@ public class ConexionBD {
         }
     }
 
+    // Mtodo que devuelve un ResultSet de una consulta (tratamiento de SELECT)
     public ResultSet consultarBD(String sentencia) {
-        try (Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
-            return stmt.executeQuery(sentencia);
-        } catch (SQLException ex) {
-            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
+        try {
+            stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            rs = stmt.executeQuery(sentencia);
+        } catch (SQLException sqlex) {
+            System.out.println(sqlex.getMessage());
+        } catch (RuntimeException rex) {
+        } catch (Exception ex) {
         }
+
+        return rs;
     }
 
+    // Mtodo que realiza un INSERT y devuelve TRUE si la operacin fue existosa
     public boolean insertarBD(String sentencia) {
-        try (Statement stmt = con.createStatement()) {
+        try {
+            stmt = con.createStatement();
             stmt.execute(sentencia);
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException | RuntimeException sqlex) {
+            System.out.println("ERROR RUTINA: " + sqlex);
             return false;
         }
+        return true;
     }
 
     public boolean borrarBD(String sentencia) {
-        try (Statement stmt = con.createStatement()) {
+        try {
+            stmt = con.createStatement();
             stmt.execute(sentencia);
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException | RuntimeException sqlex) {
+            System.out.println("ERROR RUTINA: " + sqlex);
             return false;
         }
+        return true;
     }
 
+    // Mtodo que realiza una operacin como UPDATE, DELETE, CREATE TABLE, entre otras
+    // y devuelve TRUE si la operacin fue existosa
     public boolean actualizarBD(String sentencia) {
-        try (Statement stmt = con.createStatement()) {
+        try {
+            stmt = con.createStatement();
             stmt.executeUpdate(sentencia);
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException | RuntimeException sqlex) {
+            System.out.println("ERROR RUTINA: " + sqlex);
             return false;
         }
+        return true;
     }
 
     public boolean setAutoCommitBD(boolean parametro) {
         try {
             con.setAutoCommit(parametro);
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException sqlex) {
+            System.out.println("Error al configurar el autoCommit " + sqlex.getMessage());
             return false;
         }
+        return true;
+    }
+
+    public void cerrarConexion() {
+        closeConnection(con);
     }
 
     public boolean commitBD() {
         try {
             con.commit();
             return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException sqlex) {
+            System.out.println("Error al hacer commit " + sqlex.getMessage());
             return false;
         }
     }
@@ -101,14 +137,14 @@ public class ConexionBD {
         try {
             con.rollback();
             return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException sqlex) {
+            System.out.println("Error al hacer rollback " + sqlex.getMessage());
             return false;
         }
     }
 
     public static void main(String[] args) {
         ConexionBD c = new ConexionBD();
-        c.closeConnection();
+        c.cerrarConexion();
     }
 }
