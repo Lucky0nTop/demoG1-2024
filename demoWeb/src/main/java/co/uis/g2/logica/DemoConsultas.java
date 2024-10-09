@@ -14,7 +14,13 @@ import java.util.List;
  */
 public class DemoConsultas {
     public static void main(String[] args) {
-        Autor a = new Autor();
+      /*  Autor a = new Autor("9999","Camilo","Peruano");
+        a.guardarAutor();*/
+       /* Autor a = new Autor("9999","Pedro","Boliviano");
+        a.actualizarAutor();/*      
+      */
+       Autor a=new Autor("9999");
+       a.eliminarAutor();        
         List<Autor> lista =a.listarAutores();        
         for (Autor autor : lista) {
             System.out.println(autor);

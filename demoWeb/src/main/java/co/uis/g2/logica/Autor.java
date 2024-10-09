@@ -64,22 +64,58 @@ public class Autor implements CRUDAutor {
     public String toString() {
         return "Autor{" + "codigo=" + codigo + ", nombre=" + nombre + ", nacionalidad=" + nacionalidad + '}';
     }
-    
-    
 
     @Override
     public boolean guardarAutor() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ConexionBD conexion = new ConexionBD();
+        boolean exito = false;
+        String sql = "INSERT INTO autores (codigo, nombre, nacionalidad) "
+                + "VALUES('" + this.codigo + "', '" + this.nombre + "', '" + this.nacionalidad + "');";
+        if (conexion.setAutoCommitBD(false)) {
+            if (conexion.insertarBD(sql)) {
+                conexion.commitBD();
+                exito = true;
+            } else {
+                conexion.rollbackBD();
+            }
+        }
+        conexion.cerrarConexion();
+        return exito;
     }
 
     @Override
     public boolean eliminarAutor() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ConexionBD conexion = new ConexionBD();
+        boolean exito = false;
+        String sql = "DELETE FROM autores WHERE codigo='" + this.codigo + "';";
+        if (conexion.setAutoCommitBD(false)) {
+            if (conexion.actualizarBD(sql)) {
+                conexion.commitBD();
+                exito = true;
+            } else {
+                conexion.rollbackBD();
+            }
+        }
+        conexion.cerrarConexion();
+        return exito;
     }
 
     @Override
     public boolean actualizarAutor() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ConexionBD conexion = new ConexionBD();
+        boolean exito = false;
+        String sql = "UPDATE autores set nombre='" + this.nombre + "', nacionalidad='" + this.nacionalidad
+                + "' WHERE codigo='" + this.codigo + "';";
+        if (conexion.setAutoCommitBD(false)) {
+            if (conexion.actualizarBD(sql)) {
+                conexion.commitBD();
+                exito = true;
+            } else {
+                conexion.rollbackBD();
+            }
+        }
+        conexion.cerrarConexion();
+        return exito;
     }
 
     @Override
@@ -88,24 +124,22 @@ public class Autor implements CRUDAutor {
         String query = "SELECT * FROM autores;";
         List<Autor> autores = new ArrayList<>();
         ResultSet rs = conexion.consultarBD(query);
-        try {        
+        try {
             Autor a;
             while (rs.next()) {
-                a= new Autor();
+                a = new Autor();
                 a.setCodigo(rs.getString("codigo"));
                 a.setNombre(rs.getString("nombre"));
                 a.setNacionalidad(rs.getString("nacionalidad"));
                 autores.add(a);
             }
-            
+
         } catch (SQLException ex) {
             Logger.getLogger(Autor.class.getName()).log(Level.SEVERE, null, ex);
-        } finally {           
-            //conexion.closeConnection();
-             return autores;
+        } finally {
+            conexion.cerrarConexion();
         }
-
-        
+        return autores;
     }
 
 }

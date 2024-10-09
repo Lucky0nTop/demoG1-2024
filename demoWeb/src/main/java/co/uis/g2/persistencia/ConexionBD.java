@@ -35,8 +35,8 @@ public class ConexionBD {
         try {
             // Realizar la conexion
             con = DriverManager.getConnection(url, username, password);
-            con.setTransactionIsolation(8);
-            System.out.println("conectado ☻☻☺☻");
+            con.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
+            System.out.println("conectado");
         } catch (SQLException ex) {
             Logger.getLogger(ConexionBD.class.getName()).log(Level.SEVERE, null, ex);
         }
